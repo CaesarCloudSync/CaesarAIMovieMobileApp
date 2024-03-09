@@ -12,7 +12,7 @@ import {
   } from 'react-native';
 import {Colors } from 'react-native/Libraries/NewAppScreen';
 import { choosedirectory} from './handlefilesystem';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Movies from './Movies';
 
@@ -33,6 +33,7 @@ export default function HomeScreen({navigation}:any){
     let webviewRef:any = useRef()
     const [movies,setMovies] = useState([]);
     const isDarkMode = useColorScheme() === 'dark';
+    const [allhasbeendel,setAllHasBeenDel] = useState(false);
     const backgroundStyle = {
         backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
         minHeight:useWindowDimensions().height,
@@ -51,9 +52,10 @@ export default function HomeScreen({navigation}:any){
               onPress: () => console.log('Cancel Pressed'),
               style: 'cancel',
             },
-            {text: 'OK', onPress: async () => {await deleteFiles();NativeModules.DevSettings.reload();}},
+            {text: 'OK', onPress: async () => {await deleteFiles();setAllHasBeenDel(true)}},
           ]);
     }
+ 
 
     return(
         
@@ -72,7 +74,7 @@ export default function HomeScreen({navigation}:any){
         <FlatList
         style={{margin:20}}
         data={movies}
-        renderItem={({item, index}:any) =>  <Movies key={index} uri={item.uri} title={item.name} navigation={navigation}></Movies>
+        renderItem={({item, index}:any) =>  <Movies  key={index} uri={item.uri} title={item.name} navigation={navigation} allhasbeendel={allhasbeendel}></Movies>
         }
         />
         :
@@ -86,9 +88,6 @@ export default function HomeScreen({navigation}:any){
                 <View style={{display:"flex",gap:20}}>
                     <TouchableOpacity onPress={() =>{deleteall()}}>
                     <Text>Delete All</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() =>{NativeModules.DevSettings.reload();}}>
-                    <Text>Refresh</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() =>{loadmovies()}}>
                     <Image source={require('./MoviePlus.png')} />

@@ -6,18 +6,23 @@ import { TouchableOpacity } from "react-native";
 import axios from "axios";
 import { downloadFile, getFileURI, readFile } from "./Downloadfile";
 import { Dropdown } from "./SelectDropDown";
-export default function Movies({title,uri,navigation}:any){
+export default function Movies({title,uri,navigation,allhasbeendel}:any){
     const [thumbnail,setThumbnail] = useState(null);
     const [addingsubtitle,setAddingSubtitle] = useState(false);
     const [subimdb_id,setSubImdbID] = useState("");
     const [subtitlepath,setSubtitlePath] = useState("");
     const [subtitlename,setSubtitleName] = useState("");
-    const [subtitleselectpaths,setSubtitleSelectPaths] = useState([]);
+    const [subtitleselectpaths,setSubtitleSelectPaths] = useState<any>([]);
     const [loadingsubtitle,setLoadingSubtitle] = useState(false)
 
     function isNumber(value:any) {
       return !isNaN(value);
     }
+    useEffect(()=>{
+      if (allhasbeendel === true){
+        setSubtitleSelectPaths([])
+      }
+    },[allhasbeendel])
     const handleSubtitleLink = async () =>{
       
       if (subimdb_id === ""){
@@ -39,6 +44,7 @@ export default function Movies({title,uri,navigation}:any){
             setSubtitlePath(path)
 
             setSubtitleName(result.filename)
+            setSubtitleSelectPaths(subtitleselectpaths.concat([{label:result.filename,value:path}]))
 
   
           }
@@ -51,6 +57,7 @@ export default function Movies({title,uri,navigation}:any){
             await downloadFile(result.link,result.filename)
             let path:any = await getFileURI(result.filename)
             setSubtitlePath(path)
+            setSubtitleSelectPaths(subtitleselectpaths.concat([{label:result.filename,value:path}]))
      
      
           }
@@ -81,8 +88,17 @@ export default function Movies({title,uri,navigation}:any){
       };
       useEffect(()=>{
         generateThumbnail(uri)
-        readFile(setSubtitleSelectPaths)
+        
       },[])
+      useEffect(()=>{
+        
+        readFile(setSubtitleSelectPaths)
+      },[subtitleselectpaths])
+      const cleanall = () =>{
+        setSubImdbID("")
+        setSubtitleName("")
+        setSubtitlePath("")
+      }
     return(
         <View >
             {thumbnail !== null && (uri !== undefined || uri !== null) &&
@@ -156,9 +172,15 @@ export default function Movies({title,uri,navigation}:any){
             
 
           </View>:
-          <Text>
+          <View style={{width:350,display:"flex",flexDirection:"row",gap:20}}>
+            <Text>
               {subtitlename}
           </Text>
+          <TouchableOpacity style={{width:20}} onPress={() =>{cleanall()}}>
+            <Text style={{fontSize:20}}>x</Text>
+          </TouchableOpacity>
+          </View>
+
 
                   }
 
