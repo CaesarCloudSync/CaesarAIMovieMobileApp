@@ -49,7 +49,7 @@ export default function WatchMovie({ route, navigation}:any){
         <SafeAreaView style={{backgroundColor:"black", height:height}}>
           {showReturn === true &&
                     <TouchableOpacity onPress={() =>{navigation.goBack()}}  style = {{position:"absolute",top:20,left:20,zIndex:100}}>
-                    <Text>Return</Text>
+                    <Text style={{fontSize:40}}>&larr;</Text>
                 </TouchableOpacity>}
 
         
